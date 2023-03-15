@@ -8,6 +8,7 @@
 
 #include "../base/geom_utils.h"
 #include "../base/math_utils.h"
+#include "../base/occ_handle.h"
 #include "../base/text_id.h"
 #include "../graphics/graphics_shape_object_driver.h"
 
@@ -95,7 +96,7 @@ template<ErrorCode Err> void throwErrorIf(bool cond)
 const TopoDS_Shape getShape(const GraphicsOwnerPtr& owner)
 {
     static const TopoDS_Shape nullShape;
-    auto brepOwner = Handle_StdSelect_BRepOwner::DownCast(owner);
+    auto brepOwner = OccHandle<StdSelect_BRepOwner>::DownCast(owner);
     return brepOwner ? brepOwner->Shape().Moved(owner->Location()) : nullShape;
 }
 
@@ -235,7 +236,7 @@ MeasureCircle MeasureToolBRep::brepCircleFromGeometricEdge(const TopoDS_Edge& ed
 MeasureCircle MeasureToolBRep::brepCircleFromPolygonEdge(const TopoDS_Edge& edge)
 {
     TopLoc_Location loc;
-    const Handle(Poly_Polygon3D)& polyline = BRep_Tool::Polygon3D(edge, loc);
+    const OccHandle<Poly_Polygon3D>& polyline = BRep_Tool::Polygon3D(edge, loc);
     throwErrorIf<ErrorCode::NotGeometricOrPolygonEdge>(polyline.IsNull() || polyline->NbNodes() < 7);
     // Try to create a circle from 3 sample points
     const GC_MakeCircle makeCirc(
@@ -362,7 +363,7 @@ QuantityLength MeasureToolBRep::brepLength(const TopoDS_Shape& shape)
     }
     else {
         TopLoc_Location loc;
-        const Handle(Poly_Polygon3D)& polyline = BRep_Tool::Polygon3D(edge, loc);
+        const OccHandle<Poly_Polygon3D>& polyline = BRep_Tool::Polygon3D(edge, loc);
         throwErrorIf<ErrorCode::NotGeometricOrPolygonEdge>(polyline.IsNull());
         double len = 0.;
         for (int i = 2; i <= polyline->NbNodes(); ++i) {

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "occ_brep_mesh_parameters.h"
+#include "occ_handle.h"
 
 #include <Poly_Triangulation.hxx>
 #include <TopoDS_Face.hxx>
@@ -24,7 +25,7 @@ struct BRepUtils {
     static TopoDS_Compound makeEmptyCompound();
 
     // Creates a non-geometric TopoDS_Face wrapping triangulation 'mesh'
-    static TopoDS_Face makeFace(const Handle(Poly_Triangulation)& mesh);
+    static TopoDS_Face makeFace(const OccHandle<Poly_Triangulation>& mesh);
 
     // Iterates with 'explorer' and executes 'fn' for each sub-shape
     template<typename Function>

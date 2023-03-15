@@ -17,13 +17,13 @@
 namespace Mayo {
 
 // Defined in graphics_create_driver.cpp
-Handle_Graphic3d_GraphicDriver graphicsCreateDriver();
+OccHandle<Graphic3d_GraphicDriver> graphicsCreateDriver();
 
 namespace Internal {
 
-static Handle_V3d_Viewer createOccViewer()
+static OccHandle<V3d_Viewer> createOccViewer()
 {
-    Handle_V3d_Viewer viewer = new V3d_Viewer(graphicsCreateDriver());
+    OccHandle<V3d_Viewer> viewer = new V3d_Viewer(graphicsCreateDriver());
     viewer->SetDefaultViewSize(1000.);
     viewer->SetDefaultViewProj(V3d_XposYnegZpos);
     viewer->SetComputedMode(true);
@@ -46,7 +46,7 @@ static Handle_V3d_Viewer createOccViewer()
     viewer->SetLightOn();
 
 #if 0
-    for (const Handle(Graphic3d_CLight)& light : viewer->DefinedLights()) {
+    for (const OccHandle<Graphic3d_CLight>& light : viewer->DefinedLights()) {
         if (light->Name() == "amblight" || light->Type() == Graphic3d_TypeOfLightSource_Ambient) {
             light->SetIntensity(1.f);
         }
@@ -68,7 +68,7 @@ namespace {
 class InteractiveContext : public AIS_InteractiveContext {
     DEFINE_STANDARD_RTTI_INLINE(InteractiveContext, AIS_InteractiveContext)
 public:
-    InteractiveContext(const Handle_V3d_Viewer& viewer)
+    InteractiveContext(const OccHandle<V3d_Viewer>& viewer)
         : AIS_InteractiveContext(viewer)
     {}
 
@@ -81,8 +81,8 @@ DEFINE_STANDARD_HANDLE(InteractiveContext, AIS_InteractiveContext)
 
 class GraphicsScene::Private {
 public:
-    Handle_V3d_Viewer m_v3dViewer;
-    Handle_InteractiveContext m_aisContext;
+    OccHandle<V3d_Viewer> m_v3dViewer;
+    OccHandle<InteractiveContext> m_aisContext;
     std::unordered_set<const AIS_InteractiveObject*> m_setClipPlaneSensitive;
     bool m_isRedrawBlocked = false;
     SelectionMode m_selectionMode = SelectionMode::Single;
@@ -100,17 +100,17 @@ GraphicsScene::~GraphicsScene()
     delete d;
 }
 
-opencascade::handle<V3d_View> GraphicsScene::createV3dView()
+OccHandle<V3d_View> GraphicsScene::createV3dView()
 {
     return d->m_v3dViewer->CreateView();
 }
 
-const opencascade::handle<V3d_Viewer>& GraphicsScene::v3dViewer() const
+const OccHandle<V3d_Viewer>& GraphicsScene::v3dViewer() const
 {
     return d->m_v3dViewer;
 }
 
-const opencascade::handle<StdSelect_ViewerSelector3d>& GraphicsScene::mainSelector() const
+const OccHandle<StdSelect_ViewerSelector3d>& GraphicsScene::mainSelector() const
 {
     return d->m_aisContext->MainSelector();
 }
@@ -120,12 +120,12 @@ bool GraphicsScene::hiddenLineDrawingOn() const
     return d->m_aisContext->DrawHiddenLine();
 }
 
-const opencascade::handle<Prs3d_Drawer>& GraphicsScene::drawerDefault() const
+const OccHandle<Prs3d_Drawer>& GraphicsScene::drawerDefault() const
 {
     return d->m_aisContext->DefaultDrawer();
 }
 
-const opencascade::handle<Prs3d_Drawer>& GraphicsScene::drawerHighlight(Prs3d_TypeOfHighlight style) const
+const OccHandle<Prs3d_Drawer>& GraphicsScene::drawerHighlight(Prs3d_TypeOfHighlight style) const
 {
     return d->m_aisContext->HighlightStyle(style);
 }
@@ -178,12 +178,12 @@ void GraphicsScene::deactivateObjectSelection(const GraphicsObjectPtr &object)
     d->m_aisContext->Deactivate(object);
 }
 
-void GraphicsScene::addSelectionFilter(const Handle_SelectMgr_Filter& filter)
+void GraphicsScene::addSelectionFilter(const OccHandle<SelectMgr_Filter>& filter)
 {
     d->m_aisContext->AddFilter(filter);
 }
 
-void GraphicsScene::removeSelectionFilter(const Handle_SelectMgr_Filter& filter)
+void GraphicsScene::removeSelectionFilter(const OccHandle<SelectMgr_Filter>& filter)
 {
     d->m_aisContext->RemoveFilter(filter);
 }
@@ -263,12 +263,12 @@ AIS_InteractiveContext* GraphicsScene::aisContextPtr() const
 void GraphicsScene::toggleOwnerSelection(const GraphicsOwnerPtr& gfxOwner)
 {
     auto gfxObject = GraphicsObjectPtr::DownCast(
-                gfxOwner ? gfxOwner->Selectable() : Handle_SelectMgr_SelectableObject());
+                gfxOwner ? gfxOwner->Selectable() : OccHandle<SelectMgr_SelectableObject>());
     if (GraphicsUtils::AisObject_isVisible(gfxObject))
         d->m_aisContext->AddOrRemoveSelected(gfxOwner, false);
 }
 
-void GraphicsScene::highlightAt(int xPos, int yPos, const Handle_V3d_View& view)
+void GraphicsScene::highlightAt(int xPos, int yPos, const OccHandle<V3d_View>& view)
 {
     d->m_aisContext->MoveTo(xPos, yPos, view, false);
 }

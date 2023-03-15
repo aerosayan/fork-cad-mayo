@@ -53,10 +53,10 @@ const Enumeration& systemFontNames()
     static Enumeration fontNames;
     static TColStd_SequenceOfHAsciiString seqFontName;
     if (fontNames.empty()) {
-        Handle_Font_FontMgr fontMgr = Font_FontMgr::GetInstance();
+        OccHandle<Font_FontMgr> fontMgr = Font_FontMgr::GetInstance();
         fontMgr->GetAvailableFontsNames(seqFontName);
         int i = 0;
-        for (const Handle_TCollection_HAsciiString& fontName : seqFontName)
+        for (const OccHandle<TCollection_HAsciiString>& fontName : seqFontName)
             fontNames.addItem(i++, { {}, to_stdStringView(fontName->String()) });
     }
 
@@ -97,8 +97,8 @@ public:
 
     void ReportError(const char* msg) override;
 
-    static Handle_Geom_BSplineCurve createSplineFromPolesAndKnots(struct SplineData& sd);
-    static Handle_Geom_BSplineCurve createInterpolationSpline(struct SplineData& sd);
+    static OccHandle<Geom_BSplineCurve> createSplineFromPolesAndKnots(struct SplineData& sd);
+    static OccHandle<Geom_BSplineCurve> createInterpolationSpline(struct SplineData& sd);
 
     gp_Pnt toPnt(const double* coords) const;
     void addShape(const TopoDS_Shape& shape);
@@ -148,9 +148,9 @@ bool DxfReader::readFile(const FilePath& filepath, TaskProgress* progress)
 TDF_LabelSequence DxfReader::transfer(DocumentPtr doc, TaskProgress* progress)
 {
     TDF_LabelSequence seqLabel;
-    Handle_XCAFDoc_ShapeTool shapeTool = doc->xcaf().shapeTool();
-    Handle_XCAFDoc_ColorTool colorTool = doc->xcaf().colorTool();
-    Handle_XCAFDoc_LayerTool layerTool = doc->xcaf().layerTool();
+    OccHandle<XCAFDoc_ShapeTool> shapeTool = doc->xcaf().shapeTool();
+    OccHandle<XCAFDoc_ColorTool> colorTool = doc->xcaf().colorTool();
+    OccHandle<XCAFDoc_LayerTool> layerTool = doc->xcaf().layerTool();
     std::unordered_map<std::string, TDF_Label> mapLayerNameLabel;
     std::unordered_map<Aci_t, TDF_Label> mapAciColorLabel;
 
@@ -395,7 +395,7 @@ void DxfReader::Internal::OnReadSpline(SplineData& sd)
     // 1: Closed, 2: Periodic, 4: Rational, 8: Planar, 16: Linear
 
     try {
-        Handle_Geom_BSplineCurve geom;
+        OccHandle<Geom_BSplineCurve> geom;
         if (sd.control_points > 0)
             geom = createSplineFromPolesAndKnots(sd);
         else if (sd.fit_points > 0)
@@ -498,7 +498,7 @@ void DxfReader::Internal::addShape(const TopoDS_Shape& shape)
 }
 
 // Excerpted from FreeCad/src/Mod/Import/App/ImpExpDxf
-Handle_Geom_BSplineCurve DxfReader::Internal::createSplineFromPolesAndKnots(struct SplineData& sd)
+OccHandle<Geom_BSplineCurve> DxfReader::Internal::createSplineFromPolesAndKnots(struct SplineData& sd)
 {
     const size_t numPoles = sd.control_points;
     if (sd.controlx.size() > numPoles
@@ -556,14 +556,14 @@ Handle_Geom_BSplineCurve DxfReader::Internal::createSplineFromPolesAndKnots(stru
 }
 
 // Excerpted from FreeCad/src/Mod/Import/App/ImpExpDxf
-Handle_Geom_BSplineCurve DxfReader::Internal::createInterpolationSpline(struct SplineData& sd)
+OccHandle<Geom_BSplineCurve> DxfReader::Internal::createInterpolationSpline(struct SplineData& sd)
 {
     const size_t numPoints = sd.fit_points;
     if (sd.fitx.size() > numPoints || sd.fity.size() > numPoints || sd.fitz.size() > numPoints)
         return {};
 
     // handle the poles
-    Handle_TColgp_HArray1OfPnt fitpoints = new TColgp_HArray1OfPnt(1, sd.fit_points);
+    OccHandle<TColgp_HArray1OfPnt> fitpoints = new TColgp_HArray1OfPnt(1, sd.fit_points);
     int index = 1;
     for (auto x : sd.fitx)
         fitpoints->ChangeValue(index++).SetX(x);

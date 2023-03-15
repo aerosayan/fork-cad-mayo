@@ -16,7 +16,7 @@
 
 namespace Mayo {
 
-GraphicsMeshDataSource::GraphicsMeshDataSource(const Handle_Poly_Triangulation& mesh)
+GraphicsMeshDataSource::GraphicsMeshDataSource(const OccHandle<Poly_Triangulation>& mesh)
     : m_mesh(mesh)
 {
     if (!m_mesh.IsNull()) {

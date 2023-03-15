@@ -40,7 +40,7 @@ bool RecentFile::recordThumbnail(GuiDocument* guiDoc, QSize size)
     params.width = size.width();
     params.height = size.height();
     params.backgroundColor = QtGuiUtils::toPreferredColorSpace(mayoTheme()->color(Theme::Color::Palette_Window));
-    Handle_Image_AlienPixMap pixmap = IO::ImageWriter::createImage(guiDoc, params);
+    OccHandle<Image_AlienPixMap> pixmap = IO::ImageWriter::createImage(guiDoc, params);
     if (!pixmap) {
         qDebug() << "Empty pixmap returned by IO::ImageWriter::createImage()";
         return false;

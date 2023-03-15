@@ -24,7 +24,7 @@
 
 namespace Mayo {
 
-WidgetClipPlanes::WidgetClipPlanes(const Handle_V3d_View& view3d, QWidget* parent)
+WidgetClipPlanes::WidgetClipPlanes(const OccHandle<V3d_View>& view3d, QWidget* parent)
     : QWidget(parent),
       m_ui(new Ui_WidgetClipPlanes),
       m_view(view3d)
@@ -69,7 +69,7 @@ WidgetClipPlanes::WidgetClipPlanes(const Handle_V3d_View& view3d, QWidget* paren
             m_view->Redraw();
         }
         else if (property == &appModule->properties()->clipPlanesCappingHatchOn) {
-            Handle_Graphic3d_TextureMap hatchTexture;
+            OccHandle<Graphic3d_TextureMap> hatchTexture;
             if (m_textureCapping && appModule->properties()->clipPlanesCappingHatchOn)
                 hatchTexture = m_textureCapping;
 
@@ -115,7 +115,7 @@ void WidgetClipPlanes::setClippingOn(bool on)
 void WidgetClipPlanes::connectUi(ClipPlaneData* data)
 {
     UiClipPlane& ui = data->ui;
-    const Handle_Graphic3d_ClipPlane& gfx = data->graphics;
+    const OccHandle<Graphic3d_ClipPlane>& gfx = data->graphics;
     QAbstractSlider* posSlider = ui.posSlider();
     QDoubleSpinBox* posSpin = ui.posSpin();
     auto signalSpinValueChanged = qOverload<double>(&QDoubleSpinBox::valueChanged);
@@ -200,7 +200,7 @@ void WidgetClipPlanes::connectUi(ClipPlaneData* data)
     }
 }
 
-void WidgetClipPlanes::setPlaneOn(const Handle_Graphic3d_ClipPlane& plane, bool on)
+void WidgetClipPlanes::setPlaneOn(const OccHandle<Graphic3d_ClipPlane>& plane, bool on)
 {
     plane->SetOn(on);
     if (!GraphicsUtils::V3dView_hasClipPlane(m_view, plane))
@@ -241,7 +241,7 @@ void WidgetClipPlanes::createPlaneCappingTexture()
         const QByteArray fileContents = file.readAll();
         const QByteArray filenameUtf8 = file.fileName().toUtf8();
         auto fileContentsData = reinterpret_cast<const Standard_Byte*>(fileContents.constData());
-        Handle_Image_AlienPixMap imageCapping = new Image_AlienPixMap;
+        OccHandle<Image_AlienPixMap> imageCapping = new Image_AlienPixMap;
         imageCapping->Load(fileContentsData, fileContents.size(), filenameUtf8.constData());
         m_textureCapping = new Graphic3d_Texture2Dmanual(imageCapping);
         m_textureCapping->EnableModulate();

@@ -63,7 +63,7 @@
 namespace Mayo {
 
 // Declared in graphics/graphics_create_driver.cpp
-void setFunctionCreateGraphicsDriver(std::function<Handle_Graphic3d_GraphicDriver()> fn);
+void setFunctionCreateGraphicsDriver(std::function<OccHandle<Graphic3d_GraphicDriver>()> fn);
 
 // Provides an i18n context for the current file(main.cpp)
 class Main {

@@ -1,18 +1,16 @@
 /****************************************************************************
-** Copyright (c) 2021, Fougue Ltd. <http://www.fougue.pro>
+** Copyright (c) 2023, Fougue Ltd. <http://www.fougue.pro>
 ** All rights reserved.
 ** See license at https://github.com/fougue/mayo/blob/master/LICENSE.txt
 ****************************************************************************/
 
 #pragma once
 
-#include "occ_handle.h"
-#include <TDocStd_Document.hxx>
+#include <Standard_Handle.hxx>
 
 namespace Mayo {
 
-class Document;
-DEFINE_STANDARD_HANDLE(Document, TDocStd_Document)
-using DocumentPtr = OccHandle<Document>;
+// Template alias on OpenCascade handle
+template<typename T> using OccHandle = opencascade::handle<T>;
 
 } // namespace Mayo

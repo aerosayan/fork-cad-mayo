@@ -64,7 +64,7 @@ protected:
     static std::string text(const gp_Pnt& pnt, const MeasureDisplayConfig& config);
     static std::string text(double value, const MeasureDisplayConfig& config);
     static std::string graphicsText(const gp_Pnt& pnt, const MeasureDisplayConfig& config);
-    static void adaptScale(const Handle_AIS_TextLabel& gfxText, const MeasureDisplayConfig& config);
+    static void adaptScale(const OccHandle<AIS_TextLabel>& gfxText, const MeasureDisplayConfig& config);
 
     static void applyGraphicsDefaults(IMeasureDisplay* measureDisplay);
 
@@ -86,7 +86,7 @@ public:
 
 private:
     gp_Pnt m_pnt;
-    Handle_AIS_TextLabel m_gfxText;
+    OccHandle<AIS_TextLabel> m_gfxText;
 };
 
 // --
@@ -102,9 +102,9 @@ public:
 
 private:
     gp_Circ m_circle;
-    Handle_AIS_Point m_gfxPoint;
-    Handle_AIS_TextLabel m_gfxText;
-    Handle_AIS_Circle m_gfxCircle;
+    OccHandle<AIS_Point> m_gfxPoint;
+    OccHandle<AIS_TextLabel> m_gfxText;
+    OccHandle<AIS_Circle> m_gfxCircle;
 };
 
 // --
@@ -122,9 +122,9 @@ private:
     static gp_Pnt diameterOpposedPnt(const gp_Pnt& pntOnCircle, const gp_Circ& circ);
 
     gp_Circ m_circle;
-    Handle_AIS_Circle m_gfxCircle;
-    Handle_AIS_Line m_gfxDiameter;
-    Handle_AIS_TextLabel m_gfxDiameterText;
+    OccHandle<AIS_Circle> m_gfxCircle;
+    OccHandle<AIS_Line> m_gfxDiameter;
+    OccHandle<AIS_TextLabel> m_gfxDiameterText;
 };
 
 // --
@@ -140,10 +140,10 @@ public:
 
 private:
     MeasureMinDistance m_dist;
-    Handle_AIS_Line m_gfxLength;
-    Handle_AIS_TextLabel m_gfxDistText;
-    Handle_AIS_Point m_gfxPnt1;
-    Handle_AIS_Point m_gfxPnt2;
+    OccHandle<AIS_Line> m_gfxLength;
+    OccHandle<AIS_TextLabel> m_gfxDistText;
+    OccHandle<AIS_Point> m_gfxPnt1;
+    OccHandle<AIS_Point> m_gfxPnt2;
 };
 
 // --
@@ -159,10 +159,10 @@ public:
 
 private:
     MeasureAngle m_angle;
-    Handle_AIS_Line m_gfxEntity1;
-    Handle_AIS_Line m_gfxEntity2;
-    Handle_AIS_Circle m_gfxAngle;
-    Handle_AIS_TextLabel m_gfxAngleText;
+    OccHandle<AIS_Line> m_gfxEntity1;
+    OccHandle<AIS_Line> m_gfxEntity2;
+    OccHandle<AIS_Circle> m_gfxAngle;
+    OccHandle<AIS_TextLabel> m_gfxAngleText;
 };
 
 // --

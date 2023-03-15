@@ -30,7 +30,7 @@ double MeshUtils::triangleArea(const gp_XYZ& p1, const gp_XYZ& p2, const gp_XYZ&
     return 0.5 * std::sqrt(cx*cx + cy*cy + cz*cz);
 }
 
-double MeshUtils::triangulationVolume(const Handle_Poly_Triangulation& triangulation)
+double MeshUtils::triangulationVolume(const OccHandle<Poly_Triangulation>& triangulation)
 {
     if (!triangulation)
         return 0;
@@ -49,7 +49,7 @@ double MeshUtils::triangulationVolume(const Handle_Poly_Triangulation& triangula
     return std::abs(volume);
 }
 
-double MeshUtils::triangulationArea(const Handle_Poly_Triangulation& triangulation)
+double MeshUtils::triangulationArea(const OccHandle<Poly_Triangulation>& triangulation)
 {
     if (!triangulation)
         return 0;
@@ -68,7 +68,7 @@ double MeshUtils::triangulationArea(const Handle_Poly_Triangulation& triangulati
     return area;
 }
 
-void MeshUtils::setNode(const Handle_Poly_Triangulation& triangulation, int index, const gp_Pnt& pnt)
+void MeshUtils::setNode(const OccHandle<Poly_Triangulation>& triangulation, int index, const gp_Pnt& pnt)
 {
 #if OCC_VERSION_HEX >= 0x070600
     triangulation->SetNode(index, pnt);
@@ -77,7 +77,7 @@ void MeshUtils::setNode(const Handle_Poly_Triangulation& triangulation, int inde
 #endif
 }
 
-void MeshUtils::setTriangle(const Handle_Poly_Triangulation& triangulation, int index, const Poly_Triangle& triangle)
+void MeshUtils::setTriangle(const OccHandle<Poly_Triangulation>& triangulation, int index, const Poly_Triangle& triangle)
 {
 #if OCC_VERSION_HEX >= 0x070600
     triangulation->SetTriangle(index, triangle);
@@ -86,7 +86,7 @@ void MeshUtils::setTriangle(const Handle_Poly_Triangulation& triangulation, int 
 #endif
 }
 
-void MeshUtils::setNormal(const Handle_Poly_Triangulation& triangulation, int index, const Poly_Triangulation_NormalType& n)
+void MeshUtils::setNormal(const OccHandle<Poly_Triangulation>& triangulation, int index, const Poly_Triangulation_NormalType& n)
 {
 #if OCC_VERSION_HEX >= 0x070600
     triangulation->SetNormal(index, n);
@@ -98,7 +98,7 @@ void MeshUtils::setNormal(const Handle_Poly_Triangulation& triangulation, int in
 #endif
 }
 
-void MeshUtils::allocateNormals(const Handle_Poly_Triangulation& triangulation)
+void MeshUtils::allocateNormals(const OccHandle<Poly_Triangulation>& triangulation)
 {
 #if OCC_VERSION_HEX >= 0x070600
     triangulation->AddNormals();

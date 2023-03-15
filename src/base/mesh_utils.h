@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "occ_handle.h"
+
 #include <Poly_Triangulation.hxx>
 #include <Standard_Version.hxx>
 class gp_XYZ;
@@ -16,8 +18,8 @@ struct MeshUtils {
     static double triangleSignedVolume(const gp_XYZ& p1, const gp_XYZ& p2, const gp_XYZ& p3);
     static double triangleArea(const gp_XYZ& p1, const gp_XYZ& p2, const gp_XYZ& p3);
 
-    static double triangulationVolume(const Handle_Poly_Triangulation& triangulation);
-    static double triangulationArea(const Handle_Poly_Triangulation& triangulation);
+    static double triangulationVolume(const OccHandle<Poly_Triangulation>& triangulation);
+    static double triangulationArea(const OccHandle<Poly_Triangulation>& triangulation);
 
 #if OCC_VERSION_HEX >= 0x070600
     using Poly_Triangulation_NormalType = gp_Vec3f;
@@ -25,12 +27,12 @@ struct MeshUtils {
     using Poly_Triangulation_NormalType = gp_Vec;
 #endif
 
-    static void setNode(const Handle_Poly_Triangulation& triangulation, int index, const gp_Pnt& pnt);
-    static void setTriangle(const Handle_Poly_Triangulation& triangulation, int index, const Poly_Triangle& triangle);
-    static void setNormal(const Handle_Poly_Triangulation& triangulation, int index, const Poly_Triangulation_NormalType& n);
-    static void allocateNormals(const Handle_Poly_Triangulation& triangulation);
+    static void setNode(const OccHandle<Poly_Triangulation>& triangulation, int index, const gp_Pnt& pnt);
+    static void setTriangle(const OccHandle<Poly_Triangulation>& triangulation, int index, const Poly_Triangle& triangle);
+    static void setNormal(const OccHandle<Poly_Triangulation>& triangulation, int index, const Poly_Triangulation_NormalType& n);
+    static void allocateNormals(const OccHandle<Poly_Triangulation>& triangulation);
 
-    static const Poly_Array1OfTriangle& triangles(const Handle_Poly_Triangulation& triangulation) {
+    static const Poly_Array1OfTriangle& triangles(const OccHandle<Poly_Triangulation>& triangulation) {
 #if OCC_VERSION_HEX < 0x070600
         return triangulation->Triangles();
 #else

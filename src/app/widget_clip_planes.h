@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "../base/occ_handle.h"
+
 #include <QtWidgets/QWidget>
 #include <Bnd_Box.hxx>
 #include <Graphic3d_ClipPlane.hxx>
@@ -22,7 +24,7 @@ namespace Mayo {
 class WidgetClipPlanes : public QWidget {
     Q_OBJECT
 public:
-    WidgetClipPlanes(const Handle_V3d_View& view3d, QWidget* parent = nullptr);
+    WidgetClipPlanes(const OccHandle<V3d_View>& view3d, QWidget* parent = nullptr);
     ~WidgetClipPlanes();
 
     void setRanges(const Bnd_Box& box);
@@ -45,7 +47,7 @@ private:
     };
 
     struct ClipPlaneData {
-        Handle_Graphic3d_ClipPlane graphics;
+        OccHandle<Graphic3d_ClipPlane> graphics;
         UiClipPlane ui;
     };
 
@@ -53,16 +55,16 @@ private:
 
     void connectUi(ClipPlaneData* data);
 
-    void setPlaneOn(const Handle_Graphic3d_ClipPlane& plane, bool on);
+    void setPlaneOn(const OccHandle<Graphic3d_ClipPlane>& plane, bool on);
     void setPlaneRange(ClipPlaneData* data, const Range& range);
 
     void createPlaneCappingTexture();
 
     class Ui_WidgetClipPlanes* m_ui;
-    Handle_V3d_View m_view;
+    OccHandle<V3d_View> m_view;
     std::vector<ClipPlaneData> m_vecClipPlaneData;
     Bnd_Box m_bndBox;
-    Handle_Graphic3d_TextureMap m_textureCapping;
+    OccHandle<Graphic3d_TextureMap> m_textureCapping;
 };
 
 } // namespace Mayo
