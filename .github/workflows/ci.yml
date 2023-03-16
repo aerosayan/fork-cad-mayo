@@ -58,3 +58,10 @@ jobs:
               GH_CASCADE_BASE_DIR=`brew info opencascade | grep -E -i --only-matching --max-count=1 "^(/[a-z\.\-_0-9]+)+"`
               echo "GH_CASCADE_INC_DIR=$GH_CASCADE_BASE_DIR/include/opencascade" >> $GITHUB_ENV
               echo "GH_CASCADE_LIB_DIR=$GH_CASCADE_BASE_DIR/lib" >> $GITHUB_ENV
+
+        - name: Get count of CPU cores
+          uses: SimenB/github-actions-cpu-cores@v1
+          id: cpu-cores
+
+        - name: Create Build folder
+          run: mkdir ${{github.workspace}}/build
