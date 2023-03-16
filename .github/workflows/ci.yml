@@ -42,8 +42,20 @@ jobs:
           with:
               cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
+        - name: Download OpenCascade[Windows]
+          if: runner.os == 'Windows'
+          uses: carlosperate/download-file-action@v2
+          with:
+              file-url: 'https://www.fougue.pro/share/bin/OpenCASCADE-${{matrix.occ_version}}-vc14-64.rar'
+
+        - name: Extract OpenCascade[Windows]
+          if: runner.os == 'Windows'
+          uses: edgarrc/action-7z@v1
+          with:
+              args: 7z x OpenCASCADE-${{matrix.occ_version}}-vc14-64.rar
+
         - name: Install OpenCascade[Ubuntu]
-          if: startsWith(matrix.os, 'ubuntu')
+          if: runner.os == 'Linux'
           run: |
               sudo apt-get -y install libocct-data-exchange-dev libocct-draw-dev
               GH_CASCADE_INC_DIR=`dpkg -L libocct-foundation-dev | grep -i "Standard_Version.hxx" | sed "s/\/Standard_Version.hxx//i"`
@@ -52,7 +64,7 @@ jobs:
               echo "GH_CASCADE_LIB_DIR=$GH_CASCADE_LIB_DIR" >> $GITHUB_ENV
 
         - name: Install OpenCascade[macOS]
-          if: startsWith(matrix.os, 'macos')
+          if: runner.os == 'macOS'
           run: |
               brew install opencascade
               GH_CASCADE_BASE_DIR=`brew info opencascade | grep -E -i --only-matching --max-count=1 "^(/[a-z\.\-_0-9]+)+"`
@@ -66,8 +78,19 @@ jobs:
         - name: Create Build folder
           run: mkdir ${{github.workspace}}/build
 
+        - name: QMake[Windows]
+          if: runner.os == 'Windows'
+          working-directory: ${{github.workspace}}/build
+          shell: cmd
+          run: |
+              call ..\OpenCASCADE-${{matrix.occ_version}}-vc14-64\opencascade-${{matrix.occ_version}}\env.bat
+              echo CSF_OCCTIncludePath=${{env.CSF_OCCTIncludePath}}
+              echo CSF_OCCTLibPath=${{env.CSF_OCCTLibPath}}
+              qmake --version
+              qmake ..\source -t vcapp
+
         - name: QMake[Ubuntu & macOS]
-          if: runner.os != 'Windows'
+          if: runner.os == 'Linux' || runner.os == 'macOS'
           working-directory: ${{github.workspace}}/build
           run: |
               echo CASCADE_INC_DIR=${{env.GH_CASCADE_INC_DIR}}
@@ -75,3 +98,49 @@ jobs:
               [ ! -d $CASCADE_INC_DIR ] && echo "ERROR: OpenCascade include dir doesn't exist"
               [ ! -d $CASCADE_LIB_DIR ] && echo "ERROR: OpenCascade lib dir doesn't exist"
               qmake ../source  CASCADE_INC_DIR=${{env.GH_CASCADE_INC_DIR}}  CASCADE_LIB_DIR=${{env.GH_CASCADE_LIB_DIR}}  CONFIG+=withtests
+
+        - name: Add msbuild to PATH[Windows]
+          if: runner.os == 'Windows'
+          uses: microsoft/setup-msbuild@v1.1
+          with:
+              msbuild-architecture: x64
+
+        - name: Build[Windows]
+          if: runner.os == 'Windows'
+          working-directory: ${{github.workspace}}/build
+          run: |
+              msbuild mayo.vcxproj -t:rebuild -property:Configuration=Release
+
+        - name: Build[Ubuntu & macOS]
+          if: runner.os == 'Linux' || runner.os == 'macOS'
+          working-directory: ${{github.workspace}}/build
+          run: |
+              make -j${{steps.cpu-cores.outputs.count}}
+
+        - name: Execute Unit Tests[Windows]
+          if: runner.os == 'Windows'
+          working-directory: ${{github.workspace}}/build
+          run: |
+              release\mayo.exe --runtests
+
+        - name: Execute Unit Tests[Ubuntu]
+          if: runner.os == 'Linux'
+          working-directory: ${{github.workspace}}/build
+          env:
+              DISPLAY: :0
+          run: |
+              # Install french locale for testing case
+              echo "fr_FR ISO-8859-1" | sudo tee -a /etc/locale.gen
+              sudo locale-gen
+              localectl list-locales
+              # Start X11 display server
+              Xvfb $DISPLAY -screen 0 1280x1024x24 &
+              sleep 5s
+              # Run tests
+              ./mayo --runtests
+
+        - name: Execute Unit Tests[macOS]
+          if: runner.os == 'macOS'
+          working-directory: ${{github.workspace}}/build
+          run: |
+              ./mayo.app/Contents/MacOS/mayo --runtests
