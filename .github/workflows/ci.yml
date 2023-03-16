@@ -46,7 +46,7 @@ jobs:
           if: startsWith(matrix.os, 'windows')
           uses: carlosperate/download-file-action@v2
           with:
-            file-url: 'https://www.fougue.pro/share/bin/OpenCASCADE-${{matrix.occversion}}-vc14-64.rar'
+              file-url: 'https://www.fougue.pro/share/bin/OpenCASCADE-${{matrix.occversion}}-vc14-64.rar'
 
         - name: Extract OpenCascade[Windows]
           if: startsWith(matrix.os, 'windows')
