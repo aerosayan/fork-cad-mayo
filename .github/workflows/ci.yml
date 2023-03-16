@@ -8,17 +8,17 @@ jobs:
             fail-fast: false
             matrix:
                 os: [windows-latest, ubuntu-latest, macos-latest]
-                occversion: [package]
+                occ_version: [package]
                 include:
                     - os: windows-latest
-                      occversion: 7.4.0
+                      occ_version: 7.4.0
                     - os: windows-latest
-                      occversion: 7.5.0
+                      occ_version: 7.5.0
                     - os: windows-latest
-                      occversion: 7.6.0
+                      occ_version: 7.6.0
                 exclude:
                     - os: windows-latest
-                      occversion: package
+                      occ_version: package
 
         runs-on: ${{matrix.os}}
 
@@ -46,13 +46,13 @@ jobs:
           if: startsWith(matrix.os, 'windows')
           uses: carlosperate/download-file-action@v2
           with:
-              file-url: 'https://www.fougue.pro/share/bin/OpenCASCADE-${{matrix.occversion}}-vc14-64.rar'
+              file-url: 'https://www.fougue.pro/share/bin/OpenCASCADE-${{matrix.occ_version}}-vc14-64.rar'
 
         - name: Extract OpenCascade[Windows]
           if: startsWith(matrix.os, 'windows')
           uses: edgarrc/action-7z@v1
           with:
-              args: 7z x OpenCASCADE-${{matrix.occversion}}-vc14-64.rar
+              args: 7z x OpenCASCADE-${{matrix.occ_version}}-vc14-64.rar
 
         - name: Install OpenCascade[Ubuntu]
           if: startsWith(matrix.os, 'ubuntu')
@@ -87,12 +87,13 @@ jobs:
         - name: QMake[Windows]
           if: startsWith(matrix.os, 'windows')
           working-directory: ${{github.workspace}}/build
+          shell: cmd
           run: |
-              call ../OpenCASCADE-${{matrix.occversion}}-vc14-64/opencascade-${{matrix.occversion}}/env.bat
+              call ..\OpenCASCADE-${{matrix.occ_version}}-vc14-64\opencascade-${{matrix.occ_version}}\env.bat
               echo CSF_OCCTIncludePath=${{env.CSF_OCCTIncludePath}}
               echo CSF_OCCTLibPath=${{env.CSF_OCCTLibPath}}
               qmake --version
-              qmake ../source -t vcapp
+              qmake ..\source -t vcapp
 
         - name: QMake[Ubuntu & macOS]
           if: !startsWith(matrix.os, 'windows')
