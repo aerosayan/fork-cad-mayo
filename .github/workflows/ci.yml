@@ -8,7 +8,17 @@ jobs:
             fail-fast: false
             matrix:
                 os: [windows-latest, ubuntu-latest, macos-latest]
-                occ_version: [7.4.0, 7.5.0]
+                occ_version: [package]
+                include:
+                    - os: windows-latest
+                      occ_version: 7.4.0
+                    - os: windows-latest
+                      occ_version: 7.5.0
+                    - os: windows-latest
+                      occ_version: 7.6.0
+                exclude:
+                    - os: windows-latest
+                      occ_version: package
 
         runs-on: ${{matrix.os}}
 
