@@ -65,3 +65,13 @@ jobs:
 
         - name: Create Build folder
           run: mkdir ${{github.workspace}}/build
+
+        - name: QMake[Ubuntu & macOS]
+          if: !startsWith(matrix.os, 'windows')
+          working-directory: ${{github.workspace}}/build
+          run: |
+              echo CASCADE_INC_DIR=${{env.GH_CASCADE_INC_DIR}}
+              echo CASCADE_LIB_DIR=${{env.GH_CASCADE_LIB_DIR}}
+              [ ! -d $CASCADE_INC_DIR ] && echo "ERROR: OpenCascade include dir doesn't exist"
+              [ ! -d $CASCADE_LIB_DIR ] && echo "ERROR: OpenCascade lib dir doesn't exist"
+              qmake ../source  CASCADE_INC_DIR=${{env.GH_CASCADE_INC_DIR}}  CASCADE_LIB_DIR=${{env.GH_CASCADE_LIB_DIR}}  CONFIG+=withtests
