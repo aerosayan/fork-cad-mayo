@@ -84,16 +84,6 @@ jobs:
           with:
               msbuild-architecture: x64
 
-        - name: QMake[Windows]
-          if: startsWith(matrix.os, 'windows')
-          working-directory: ${{github.workspace}}/build
-          shell: cmd
-          run: |
-              call ..\OpenCASCADE-${{matrix.occ_version}}-vc14-64\opencascade-${{matrix.occ_version}}\env.bat
-              echo CSF_OCCTIncludePath=${{env.CSF_OCCTIncludePath}}
-              echo CSF_OCCTLibPath=${{env.CSF_OCCTLibPath}}
-              qmake --version
-              qmake ..\source -t vcapp
 
         - name: QMake[Ubuntu & macOS]
           if: !startsWith(matrix.os, 'windows')
