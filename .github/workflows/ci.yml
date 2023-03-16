@@ -7,7 +7,18 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                os: [ubuntu-latest, macos-latest]
+                os: [windows-latest, ubuntu-latest, macos-latest]
+                occversion: [package]
+                include:
+                    - os: windows-latest
+                      occversion: 7.4.0
+                    - os: windows-latest
+                      occversion: 7.5.0
+                    - os: windows-latest
+                      occversion: 7.6.0
+                exclude:
+                    - os: windows-latest
+                      occversion: package
 
         runs-on: ${{matrix.os}}
 
@@ -30,6 +41,18 @@ jobs:
           uses: jurplel/install-qt-action@v2
           with:
               cached: ${{ steps.cache-qt.outputs.cache-hit }}
+
+        - name: Download OpenCascade[Windows]
+          if: startsWith(matrix.os, 'windows')
+          uses: carlosperate/download-file-action@v2
+          with:
+            file-url: 'https://www.fougue.pro/share/bin/OpenCASCADE-${{matrix.occversion}}-vc14-64.rar'
+
+        - name: Extract OpenCascade[Windows]
+          if: startsWith(matrix.os, 'windows')
+          uses: edgarrc/action-7z@v1
+          with:
+              args: 7z x OpenCASCADE-${{matrix.occversion}}-vc14-64.rar
 
         - name: Install OpenCascade[Ubuntu]
           if: startsWith(matrix.os, 'ubuntu')
@@ -55,7 +78,24 @@ jobs:
         - name: Create Build folder
           run: mkdir ${{github.workspace}}/build
 
-        - name: QMake
+        - name: Add msbuild to PATH[Windows]
+          if: startsWith(matrix.os, 'windows')
+          uses: microsoft/setup-msbuild@v1.1
+          with:
+              msbuild-architecture: x64
+
+        - name: QMake[Windows]
+          if: startsWith(matrix.os, 'windows')
+          working-directory: ${{github.workspace}}/build
+          run: |
+              call ../OpenCASCADE-${{matrix.occversion}}-vc14-64/opencascade-${{matrix.occversion}}/env.bat
+              echo CSF_OCCTIncludePath=${{env.CSF_OCCTIncludePath}}
+              echo CSF_OCCTLibPath=${{env.CSF_OCCTLibPath}}
+              qmake --version
+              qmake ../source -t vcapp
+
+        - name: QMake[Ubuntu & macOS]
+          if: !startsWith(matrix.os, 'windows')
           working-directory: ${{github.workspace}}/build
           run: |
               echo CASCADE_INC_DIR=${{env.GH_CASCADE_INC_DIR}}
@@ -64,26 +104,23 @@ jobs:
               [ ! -d $CASCADE_LIB_DIR ] && echo "ERROR: OpenCascade lib dir doesn't exist"
               qmake ../source  CASCADE_INC_DIR=${{env.GH_CASCADE_INC_DIR}}  CASCADE_LIB_DIR=${{env.GH_CASCADE_LIB_DIR}}  CONFIG+=withtests
 
-        - name: Build
+        - name: Build[Windows]
+          if: startsWith(matrix.os, 'windows')
+          working-directory: ${{github.workspace}}/build
+          run: |
+              msbuild mayo.vcxproj -t:rebuild -property:Configuration=Release
+
+        - name: Build[Ubuntu & macOS]
+          if: !startsWith(matrix.os, 'windows')
           working-directory: ${{github.workspace}}/build
           run: |
               make -j${{steps.cpu-cores.outputs.count}}
 
-        - name: Execute Unit Tests[Ubuntu]
-          if: startsWith(matrix.os, 'ubuntu')
+        - name: Execute Unit Tests[Windows]
+          if: startsWith(matrix.os, 'windows')
           working-directory: ${{github.workspace}}/build
-          env:
-              DISPLAY: :0
           run: |
-              # Install french locale for testing case
-              echo "fr_FR ISO-8859-1" | sudo tee -a /etc/locale.gen
-              sudo locale-gen
-              localectl list-locales
-              # Start X11 display server
-              Xvfb $DISPLAY -screen 0 1280x1024x24 &
-              sleep 5s
-              # Run tests
-              ./mayo --runtests
+              release\mayo.exe --runtests
 
         - name: Execute Unit Tests[macOS]
           if: startsWith(matrix.os, 'macos')
